@@ -48,16 +48,27 @@ class AlienInvasion:
     def _create_fleet(self):
         ''' Create the fleet of aliens!'''
         alien = Alien(self)
-        alien_width = alien.rect.width
+        alien_width, alien_height = alien.rect.size
+        ship_height = self.ship.rect.height
+
         available_width = self.settings.screen_width - (2 * alien_width)
         # it is 2 * alien_width because need to take into account the empty space beside alien
         num_aliens = available_width // (2 * alien_width) 
 
+        available_height = self.settings.screen_height - (3 * alien_height + ship_height) 
+        num_rows = available_height // (2 * alien_height)
+
         # Make alien fleet
-        for alien_number in range(num_aliens): 
+        for row_number in range(num_rows):
+            for alien_number in range(num_aliens): 
+                self._create_alien(alien_number, row_number)
+
+    def _create_alien(self, alien_number, row_number):
             new_alien = Alien(self)
+            alien_width, alien_height = new_alien.rect.size
             new_alien.x = alien_width + 2 * alien_width * alien_number
             new_alien.rect.x = int(new_alien.x)
+            new_alien.rect.y = alien_height + 2 * alien_height * row_number
             self.aliens.add(new_alien)
 
     def _update_bullets(self): 
