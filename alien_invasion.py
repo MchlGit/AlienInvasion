@@ -5,6 +5,7 @@ import pygame
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 class AlienInvasion:
     """Overall class to manage game assets and behavior."""
@@ -21,6 +22,8 @@ class AlienInvasion:
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+        self._create_fleet()
 
 
     def run_game(self):
@@ -42,6 +45,21 @@ class AlienInvasion:
             elif event.type == pygame.KEYUP: 
                 self._key_updown_events(event, False)
 
+    def _create_fleet(self):
+        ''' Create the fleet of aliens!'''
+        alien = Alien(self)
+        alien_width = alien.rect.width
+        available_width = self.settings.screen_width - (2 * alien_width)
+        # it is 2 * alien_width because need to take into account the empty space beside alien
+        num_aliens = available_width // (2 * alien_width) 
+
+        # Make alien fleet
+        for alien_number in range(num_aliens): 
+            new_alien = Alien(self)
+            new_alien.x = alien_width + 2 * alien_width * alien_number
+            new_alien.rect.x = int(new_alien.x)
+            self.aliens.add(new_alien)
+
     def _update_bullets(self): 
         '''Update position of bullets and get rid of old bullets.'''
         # Update bullet positions
@@ -51,6 +69,7 @@ class AlienInvasion:
                 self.bullets.remove(bullet)
 
     def _key_updown_events(self, event, isKeyDown=True):
+        ''' handles key up and key down events '''
         if event.key == pygame.K_RIGHT: 
             # Move the ship to the right. 
             self.ship.moving_right = isKeyDown
@@ -74,6 +93,7 @@ class AlienInvasion:
         self.ship.blitme()
         for bullet in self.bullets.sprites(): 
             bullet.draw_bullet()
+        self.aliens.draw(self.screen)
         # Make the most recently drawn screen visible.
         pygame.display.flip()
 
