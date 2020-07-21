@@ -32,6 +32,7 @@ class AlienInvasion:
             
             self._check_events()
             self.ship.update()
+            self._update_aliens()
             self._update_bullets()
             self._update_screen() 
 
@@ -71,6 +72,10 @@ class AlienInvasion:
             new_alien.rect.y = alien_height + 2 * alien_height * row_number
             self.aliens.add(new_alien)
 
+    def _update_aliens(self):
+        self._check_fleet_edges()
+        self.aliens.update()
+
     def _update_bullets(self): 
         '''Update position of bullets and get rid of old bullets.'''
         # Update bullet positions
@@ -78,6 +83,18 @@ class AlienInvasion:
         for bullet in self.bullets.copy(): 
             if bullet.rect.bottom <= 0: 
                 self.bullets.remove(bullet)
+
+    def _check_fleet_edges(self): 
+        '''Respond appropriately if any aliens have reached an edge.'''
+        for alien in self.aliens.sprites(): 
+            if alien.check_edges(): 
+                self._change_fleet_direction()
+                break
+
+    def _change_fleet_direction(self): 
+        for alien in self.aliens.sprites(): 
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1
 
     def _key_updown_events(self, event, isKeyDown=True):
         ''' handles key up and key down events '''
